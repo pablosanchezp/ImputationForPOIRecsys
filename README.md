@@ -3,19 +3,16 @@ Repository containing the code for paper: Smart imputation, better recommendatio
 
 
 ## Getting Started
-Prerequisites
-
-Java 8 (at least)
-
-MATLAB
-
-Mono (for Mymedialite)
+Prerequisites:
+- Java 8 (at least)
+- MATLAB
+- Mono (for Mymedialite)
 
 
 ## Instructions
  - git clone https://github.com/pablosanchezp/ImputationForPOIRecsys.git
  - cd ImputationForPOIRecsys
- - Steps:
+ - Run the following scripts in the terminal:
     - step1_generate_datasets.sh
     - step2_generate_recommenders.sh
     - step3_generate_recommenders_imputation.sh
@@ -28,7 +25,7 @@ Mono (for Mymedialite)
 
 ## Authors
 - Pablo Sánchez - [Universidad Pontificia Comillas](https://www.comillas.edu/)
-- Alejandro Bellogín - [Universidad Autónoma de Madrid] (https://uam.es/ss/Satellite/en/home.htm)
+- Alejandro Bellogín - [Universidad Autónoma de Madrid](https://uam.es/ss/Satellite/en/home.htm)
 
 
 ## Contact
