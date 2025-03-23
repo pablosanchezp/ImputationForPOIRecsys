@@ -2,7 +2,7 @@
 
 : '
   Script for generating all the recommenders with the non-imputed version
-  (generating the recommendations with classical training and test splits)
+  (generating the recommendations with classical training and test splits. Gowalla New York)
 '
 
 
@@ -11,11 +11,11 @@ jvmMemory=-Xmx24G
 
 
 javaCommand=java
-originalCities=OriginalCities
-processedCities=ProcessedCities
+processedCities=OriginalCitiesGowalla
 extensionMap=_Mapping.txt
 
 aggregateStrategy=SUM
+#aggregateStrategy=AVERAGE
 aggregateStrategyTime=LAST
 
 
@@ -23,7 +23,6 @@ aggregateStrategyTime=LAST
 # This cities are for the original dataset of Foursquare
 
 KCore=2
-coordFile="POIS_Coords.txt"
 
 
 prefix="_K"$KCore"_AgT"$aggregateStrategyTime"_AP"$aggregateStrategy"_T"
@@ -36,8 +35,7 @@ recPrefix=rec
 # cities selected to perform the experiments.
 # I STRONGLY RECOMMEND COPY THIS FILE MULTIPLE TIMES AND SELECT THE CITY YOU WANT
 # TO PARALELIZE THE EXECUTION
-cities="MX_MexicoCity RU_Moscow CL_Santiago JP_Tokyo US_NewYork GB_London"
-
+cities="NewYorkGowalla"
 
 
 recFolder=RecommendationFolder
@@ -46,7 +44,7 @@ resultFolder=ResultFolder
 allneighbours="10 20 30 40 50 60 70 80 90 100"
 itemsRecommended=100
 
-coordFile="$processedCities"/POIS_Coords.txt
+coordFile="$processedCities"/"NewYorkGowalla_POIS_Coords.txt"
 
 allKFactorizerRankSys="10 50 100"
 allLambdaFactorizerRankSys="0.1 1 10"
@@ -122,10 +120,10 @@ maxDiffTime=1814400
 minDiffTime=60
 minClosePrefBot=3
 
-coordFile="$processedCities"/POIS_Coords.txt
+
+coordFile="$processedCities"/"NewYorkGowalla_POIS_Coords.txt"
 
 lambda_easers="0.5 200 500"
-
 # For IRenMF
 function obtainConfigureFile() #The arguments are the k, the alpha and the lambda3
 {
@@ -446,6 +444,7 @@ do
         wait
 
 # RankGeoTest
+
   for c in $cs_RANKGEOFM
   do
     for alphaF in $alphas_RANKGEOFM
@@ -500,6 +499,48 @@ do
   wait
 
 
+saenad_epoch=20
+saenad_batch_size=256
+saenad_alpha=2
+saenad_epsilon=1e-5
+saenad_learning_rate=1e-3
+saenad_weight_decay=1e-3
+saenad_num_attentions="10 20 40"
+saenad_dropout_rate=0.5
+saenad_gammas="30 60 90"
+
+for saenad_num_attention in $saenad_num_attentions
+do
+  for saenad_gamma in $saenad_gammas
+  do
+      output_rec_file=$recommendationFolder/"$recPrefix"_"$title"_ep"$saenad_epoch"_a"$saenad_alpha"_at"$saenad_num_attention"_dr"$saenad_dropout_rate"_gm"$saenad_gamma"_l200-50-200SAE-NAD.txt
+      rm experiment.npz
+      if [ ! -f "$output_rec_file" ]; then
+        python SAE-NAD_ADAPTED/run.py \
+             --epoch "$saenad_epoch" \
+             --batch_size "$saenad_batch_size" \
+             --alpha "$saenad_alpha" \
+             --epsilon "$saenad_epsilon" \
+             --learning_rate "$saenad_learning_rate" \
+             --weight_decay "$saenad_weight_decay" \
+             --num_attention "$saenad_num_attention" \
+             --dropout_rate "$saenad_dropout_rate" \
+             --gamma "$saenad_gamma" \
+             --training_file "$trainFile" \
+             --original_training_set "$trainFile" \
+             --coord_file "$cityPOICoords" \
+             --test_set "$testfile" \
+             --result_file "$output_rec_file" \
+             --nI 100
+      fi
+
+
+  done
+  wait
+
+done
+wait
+
 
       #Second baseline: popularity, knn and minimum distance
       for poiRecommender in PopGeoNN
@@ -534,47 +575,6 @@ do
       done
       wait
 
-      saenad_epoch=20
-      saenad_batch_size=256
-      saenad_alpha=2
-      saenad_epsilon=1e-5
-      saenad_learning_rate=1e-3
-      saenad_weight_decay=1e-3
-      saenad_num_attentions="10 20 40"
-      saenad_dropout_rate=0.5
-      saenad_gammas="30 60 90"
-
-
-      for saenad_num_attention in $saenad_num_attentions
-      do
-        for saenad_gamma in $saenad_gammas
-        do
-            output_rec_file=$recommendationFolder/"$recPrefix"_"$title"_ep"$saenad_epoch"_a"$saenad_alpha"_at"$saenad_num_attention"_dr"$saenad_dropout_rate"_gm"$saenad_gamma"_l200-50-200SAE-NAD.txt
-            if [ ! -f "$output_rec_file" ]; then
-              python SAE-NAD_ADAPTED/run.py \
-                   --epoch "$saenad_epoch" \
-                   --batch_size "$saenad_batch_size" \
-                   --alpha "$saenad_alpha" \
-                   --epsilon "$saenad_epsilon" \
-                   --learning_rate "$saenad_learning_rate" \
-                   --weight_decay "$saenad_weight_decay" \
-                   --num_attention "$saenad_num_attention" \
-                   --dropout_rate "$saenad_dropout_rate" \
-                   --gamma "$saenad_gamma" \
-                   --training_file "$trainFile" \
-                   --original_training_set "$trainFile" \
-                   --coord_file "$cityPOICoords" \
-                   --test_set "$testfile" \
-                   --result_file "$output_rec_file" \
-                   --nI 100
-            fi
-
-
-        done
-        wait
-
-      done
-      wait
 
   resultFileNNCityFile=$pathDest/"$processedCities"/POIS_""$city""$suffixnewTrain""_"$GeoNN"NN.txt
   poisCoordsOfCityFile=$pathDest/"$processedCities"/POIS_""$city""$suffixnewTrain""_"$extensionCoords"

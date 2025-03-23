@@ -10,8 +10,7 @@ jvmMemory=-Xmx24G
 
 
 javaCommand=java
-originalCities=OriginalCities
-processedCities=ProcessedCities
+processedCities=OriginalCitiesYelp
 extensionMap=_Mapping.txt
 
 aggregateStrategy=SUM
@@ -22,7 +21,6 @@ aggregateStrategyTime=LAST
 # This cities are for the original dataset of Foursquare
 
 KCore=2
-coordFile="POIS_Coords.txt"
 
 
 prefix="_K"$KCore"_AgT"$aggregateStrategyTime"_AP"$aggregateStrategy"_T"
@@ -33,7 +31,7 @@ suffixnewTest=$prefix"Test"
 recPrefix=rec
 
 # cities selected to perform the experiments
-cities="MX_MexicoCity RU_Moscow CL_Santiago JP_Tokyo US_NewYork GB_London"
+cities="Yelp"
 
 
 
@@ -43,7 +41,6 @@ resultFolder=ResultFolder
 allneighbours="10 20 30 40 50 60 70 80 90 100"
 itemsRecommended=30
 
-coordFile="$processedCities"/POIS_Coords.txt
 
 allKFactorizerRankSys="10 50 100"
 allLambdaFactorizerRankSys="0.1 1 10"
@@ -95,7 +92,7 @@ maxDiffTime=1814400
 minDiffTime=60
 minClosePrefBot=3
 
-coordFile="$processedCities"/POIS_Coords.txt
+coordFile="$processedCities"/"Yelp_poi_coos.txt"
 
 #IRenMF parameters and data
 #IRenMF parameters and data
@@ -232,7 +229,7 @@ do
    do
      outputRecfile=$recommendationFolder/"$recPrefix"_"$title"_RSys_"$ranksysRecommender".txt
      $javaCommand $jvmMemory -jar $JAR -o ranksysOnlyComplete -trf $trainFile -trf2 $nonImputedTrainFile -tsf $testfile -cIndex true -rr "$ranksysRecommender" -rs "notUsed" -nI $itemsRecommended -n 20 -orf $outputRecfile
-     #$javaCommand $jvmMemory -jar $JAR -o CheckRecommendationsFile -trf $nonImputedTrainFile -tsf $testfile -rf $outputRecfile
+     $javaCommand $jvmMemory -jar $JAR -o CheckRecommendationsFile -trf $nonImputedTrainFile -tsf $testfile -rf $outputRecfile
 
 
    done # End ranksys recommenders
@@ -291,77 +288,10 @@ do
 
    #RankGeoTest
 
-   if [[ $city == *CL_Santiago* ]]; then
-     UBsimilarity="SJUS"
-     neighboursUB="100"
-     neighboursIB="90"
-     IBsimilarity="SJIS"
-
-     #GeoBPRMF
-     factor="50"
-     GEOBPRNumIter="50"
-     GEOBPRLearnRate="0.05"
-     bias_reg="1"
-     regU="0.01"
-     maxDist="4"
-
-     #HKV
-     kFactor="100"
-     alphaValue="0.1"
-     lambdaValue="0.1"
-
-     #FMFMGM
-     alpha_FMFMGM="0.2"
-     theta_FMFMGM="0.02"
-     distance_FMFMGM="15"
-     iter_FMFMGM="30"
-     kfactor_FMFMGM="100"
-     alpha2_FMFMGM="20"
-     beta_FMFMGM="0.2"
-     learningRate_FMFMGM="0.0001"
-     sigmoid_FMFMGM="false"
-
-     #RankGeoFM
-     kFactorizer="100"
-     kNeighbour="100"
-     decay="1"
-     isboldDriver="true"
-     numIter="200"
-     learnRate="0.001"
-     maxRate="0.001"
-     alphaF="0.2"
-     epsilon="0.3"
-
-     #PopGeoNN
-     UBsimilarityPOP="SJUS"
-     neighboursPOP="100"
-
-     #_BPRMF_nF
-     BPRfactor="10"
-     BPRNumIter="50"
-     BPRLearnRate="0.05"
-     BPRbias_reg="0"
-     BPRregU="0.01"
-
-     #IRENMF
-     KIRENMF="100"
-     alphaIRENMF="0.4"
-     lambda3IRENMF="1"
-     clusterIRENMF="50"
-
-     lambda_easer="200"
-     implicit_easer="True"
-
-     saenad_gammas="60"
-     saenad_num_attentions="40"
-
-
-   fi
-
-   if [[ $city == *JP_Tokyo* ]]; then
-     UBsimilarity="SJUS"
-     neighboursUB="100"
-     neighboursIB="100"
+   if [[ $city == *Yelp* ]]; then
+     UBsimilarity="VCUS"
+     neighboursUB="70"
+     neighboursIB="70"
      IBsimilarity="SJIS"
 
      #GeoBPRMF
@@ -369,17 +299,16 @@ do
      GEOBPRNumIter="50"
      GEOBPRLearnRate="0.05"
      bias_reg="0"
-     regU="0.001"
-     maxDist="1"
+     regU="0.0025"
+     maxDist="4"
 
      #HKV
-     kFactor="10"
+     kFactor="100"
      alphaValue="0.1"
-     lambdaValue="1"
-
+     lambdaValue="10"
 
      #FMFMGM
-     alpha_FMFMGM="0.4"
+     alpha_FMFMGM="0.2"
      theta_FMFMGM="0.02"
      distance_FMFMGM="15"
      iter_FMFMGM="30"
@@ -394,300 +323,35 @@ do
      kNeighbour="10"
      decay="1"
      isboldDriver="true"
-     numIter="200"
-     learnRate="0.001"
-     maxRate="0.001"
-     alphaF="0.2"
-     epsilon="0.3"
-
-     #PopGeoNN
-     UBsimilarityPOP="SJUS"
-     neighboursPOP="80"
-
-     #_BPRMF_nF
-     BPRfactor="50"
-     BPRNumIter="50"
-     BPRLearnRate="0.05"
-     BPRbias_reg="0"
-     BPRregU="0.1"
-
-     #IRENMF
-     KIRENMF="100"
-     alphaIRENMF="0.4"
-     lambda3IRENMF="1"
-     clusterIRENMF="50"
-
-     lambda_easer="500"
-     implicit_easer="True"
-
-     saenad_gammas="90"
-     saenad_num_attentions="10"
-   fi
-
-   if [[ $city == *US_NewYork* ]]; then
-     UBsimilarity="SJUS"
-     neighboursUB="100"
-     neighboursIB="90"
-     IBsimilarity="SJIS"
-
-     #GeoBPRMF
-     factor="100"
-     GEOBPRNumIter="50"
-     GEOBPRLearnRate="0.05"
-     bias_reg="0.5"
-     regU="0.1"
-     maxDist="4"
-
-     #HKV
-     kFactor="50"
-     alphaValue="10"
-     lambdaValue="0.1"
-
-     #FMFMGM
-     alpha_FMFMGM="0.4"
-     theta_FMFMGM="0.1"
-     distance_FMFMGM="15"
-     iter_FMFMGM="30"
-     kfactor_FMFMGM="100"
-     alpha2_FMFMGM="20"
-     beta_FMFMGM="0.2"
-     learningRate_FMFMGM="0.0001"
-     sigmoid_FMFMGM="false"
-
-     #RankGeoFM
-     kFactorizer="100"
-     kNeighbour="100"
-     decay="1"
-     isboldDriver="true"
-     numIter="200"
-     learnRate="0.001"
-     maxRate="0.001"
-     alphaF="0.2"
-     epsilon="0.3"
-
-
-     #PopGeoNN
-     UBsimilarityPOP="SJUS"
-     neighboursPOP="100"
-
-     #_BPRMF_nF
-     BPRfactor="50"
-     BPRNumIter="50"
-     BPRLearnRate="0.05"
-     BPRbias_reg="0"
-     BPRregU="0.005"
-
-     #IRENMF
-     KIRENMF="100"
-     alphaIRENMF="0.4"
-     lambda3IRENMF="1"
-     clusterIRENMF="5"
-
-     lambda_easer="500"
-     implicit_easer="True"
-
-     saenad_gammas="30"
-     saenad_num_attentions="10"
-
-
-   fi
-
-   if [[ $city == *GB_London* ]]; then
-     UBsimilarity="SJUS"
-     neighboursUB="100"
-     neighboursIB="90"
-     IBsimilarity="SJIS"
-
-     #GeoBPRMF
-     factor="50"
-     GEOBPRNumIter="50"
-     GEOBPRLearnRate="0.05"
-     bias_reg="0.5"
-     regU="0.01"
-     maxDist="1"
-
-     #HKV
-     kFactor="100"
-     alphaValue="10"
-     lambdaValue="0.1"
-
-     #FMFMGM
-     alpha_FMFMGM="0.4"
-     theta_FMFMGM="0.1"
-     distance_FMFMGM="15"
-     iter_FMFMGM="30"
-     kfactor_FMFMGM="100"
-     alpha2_FMFMGM="20"
-     beta_FMFMGM="0.2"
-     learningRate_FMFMGM="0.0001"
-     sigmoid_FMFMGM="false"
-
-
-     #RankGeoFM
-     kFactorizer="100"
-     kNeighbour="50"
-     decay="1"
-     isboldDriver="true"
-     numIter="200"
-     learnRate="0.001"
-     maxRate="0.001"
-     alphaF="0.2"
-     epsilon="0.3"
-
-     #PopGeoNN
-     UBsimilarityPOP="SJUS"
-     neighboursPOP="100"
-
-     #_BPRMF_nF
-     BPRfactor="50"
-     BPRNumIter="50"
-     BPRLearnRate="0.05"
-     BPRbias_reg="0"
-     BPRregU="0.1"
-
-     KIRENMF="100"
-     alphaIRENMF="0.4"
-     lambda3IRENMF="1"
-     clusterIRENMF="5"
-
-     lambda_easer="500"
-     implicit_easer="True"
-
-     saenad_gammas="90"
-     saenad_num_attentions="40"
-
-   fi
-
-   if [[ $city == *MX_MexicoCity* ]]; then
-     UBsimilarity="SJUS"
-     neighboursUB="100"
-     neighboursIB="100"
-     IBsimilarity="SJIS"
-
-     #GeoBPRMF
-     factor="50"
-     GEOBPRNumIter="50"
-     GEOBPRLearnRate="0.05"
-     bias_reg="0.5"
-     regU="0.01"
-     maxDist="4"
-
-     #HKV
-     kFactor="100"
-     alphaValue="1"
-     lambdaValue="0.1"
-
-     #FMFMGM
-     alpha_FMFMGM="0.2"
-     theta_FMFMGM="0.1"
-     distance_FMFMGM="15"
-     iter_FMFMGM="30"
-     kfactor_FMFMGM="100"
-     alpha2_FMFMGM="20"
-     beta_FMFMGM="0.2"
-     learningRate_FMFMGM="0.0001"
-     sigmoid_FMFMGM="false"
-
-
-     #RankGeoFM
-     kFactorizer="100"
-     kNeighbour="200"
-     decay="1"
-     isboldDriver="true"
-     numIter="200"
+     numIter="120"
      learnRate="0.001"
      maxRate="0.001"
      alphaF="0.1"
      epsilon="0.3"
 
      #PopGeoNN
-     UBsimilarityPOP="SJUS"
-     neighboursPOP="90"
-
-     #_BPRMF_nF
-     BPRfactor="50"
-     BPRNumIter="50"
-     BPRLearnRate="0.05"
-     BPRbias_reg="0"
-     BPRregU="0.1"
-
-     KIRENMF="100"
-     alphaIRENMF="0.4"
-     lambda3IRENMF="1"
-     clusterIRENMF="5"
-
-     lambda_easer="200"
-     implicit_easer="True"
-
-     saenad_gammas="90"
-     saenad_num_attentions="40"
-
-   fi
-
-
-   if [[ $city == *RU_Moscow* ]]; then
-     UBsimilarity="SJUS"
-     neighboursUB="100"
-     neighboursIB="100"
-     IBsimilarity="SJIS"
-
-     #GeoBPRMF
-     factor="100"
-     GEOBPRNumIter="50"
-     GEOBPRLearnRate="0.05"
-     bias_reg="1"
-     regU="0.005"
-     maxDist="1"
-
-     #HKV
-     kFactor="100"
-     alphaValue="1"
-     lambdaValue="0.1"
-
-     #FMFMGM
-     alpha_FMFMGM="0.4"
-     theta_FMFMGM="0.02"
-     distance_FMFMGM="15"
-     iter_FMFMGM="30"
-     kfactor_FMFMGM="100"
-     alpha2_FMFMGM="20"
-     beta_FMFMGM="0.2"
-     learningRate_FMFMGM="0.0001"
-     sigmoid_FMFMGM="false"
-
-
-     #RankGeoFM
-     kFactorizer="100"
-     kNeighbour="100"
-     decay="1"
-     isboldDriver="true"
-     numIter="200"
-     learnRate="0.001"
-     maxRate="0.001"
-     alphaF="0.1"
-     epsilon="0.3"
-
-     #PopGeoNN
-     UBsimilarityPOP="SJUS"
-     neighboursPOP="100"
+     UBsimilarityPOP="VCUS"
+     neighboursPOP="60"
 
      #_BPRMF_nF
      BPRfactor="100"
      BPRNumIter="50"
      BPRLearnRate="0.05"
-     BPRbias_reg="1"
+     BPRbias_reg="0"
      BPRregU="0.01"
 
-     KIRENMF="100"
+     #IRENMF
+     KIRENMF="50"
      alphaIRENMF="0.4"
      lambda3IRENMF="1"
      clusterIRENMF="50"
 
+     #EASER
      lambda_easer="200"
      implicit_easer="True"
 
      saenad_gammas="90"
-     saenad_num_attentions="20"
+     saenad_num_attentions="10"
 
    fi
 
@@ -730,6 +394,7 @@ do
 
      done
      wait
+
 
    #_BPRMF_nF
 
@@ -794,7 +459,7 @@ do
 
     rankRecommenderNoSim=MFRecommenderHKV
     outputRecfile=$recommendationFolder/"$recPrefix"_"$title"_RSys_"$rankRecommenderNoSim"_kF"$kFactor"_aF"$alphaValue"_lF"$lambdaValue".txt
-    #$javaCommand $jvmMemory -jar $JAR -o ranksysOnlyComplete -trf $trainFile -trf2 $nonImputedTrainFile -tsf $testfile -cIndex false -rr $rankRecommenderNoSim -rs "notUsed" -nI $itemsRecommended -n 20 -orf $outputRecfile -kFactorizer $kFactor -aFactorizer $alphaValue -lFactorizer $lambdaValue
+    $javaCommand $jvmMemory -jar $JAR -o ranksysOnlyComplete -trf $trainFile -trf2 $nonImputedTrainFile -tsf $testfile -cIndex false -rr $rankRecommenderNoSim -rs "notUsed" -nI $itemsRecommended -n 20 -orf $outputRecfile -kFactorizer $kFactor -aFactorizer $alphaValue -lFactorizer $lambdaValue
 
 
 
@@ -834,10 +499,7 @@ do
     #$javaCommand $jvmMemory -jar $JAR -o CheckRecommendationsFile -trf $nonImputedTrainFile -tsf $testfile -rf $outputRecfile
 
 
-    output_rec_file=$recommendationFolder/"$recPrefix"_"$title"_"easer"_"lambda"$lambda_easer"_Implicit$implicit_easer".txt
-    if [ ! -f "$output_rec_file" ]; then
-      python ease_rec/main_imputation.py --training_imputation $trainFile --original_training $nonImputedTrainFile --test $testfile --implicit $implicit_easer --lamb $lambda_easer --nI $itemsRecommended --result $output_rec_file
-    fi
+
 
     #PopGeoNN
 
@@ -847,7 +509,14 @@ do
     #$javaCommand $jvmMemory -jar $JAR -o CheckRecommendationsFile -trf $nonImputedTrainFile -tsf $testfile -rf $outputRecfile
 
 
+    output_rec_file=$recommendationFolder/"$recPrefix"_"$title"_"easer"_"lambda"$lambda_easer"_ImplicitTrue".txt
+    if [ ! -f "$output_rec_file" ]; then
+      python ease_rec/main_imputation.py --training_imputation $trainFile --original_training $nonImputedTrainFile --test $testfile --implicit True --lamb $lambda_easer --nI $itemsRecommended --result $output_rec_file
+    fi
+
+
     #IRENMF
+
     resultFileNNCityFile=$pathDest/"$processedCities"/POIS_""$city""$suffixnewTrain""_"$GeoNN"NN.txt
     poisCoordsOfCityFile=$pathDest/"$processedCities"/POIS_""$city""$suffixnewTrain""_"$extensionCoords"
     configureFileSimple=$(obtainConfigureFile "$KIRENMF" "$alphaIRENMF" "$lambda3IRENMF" "$clusterIRENMF")
@@ -879,9 +548,67 @@ do
     echo "Finished $configureFileSimple"
 
 
+    if [[ $city == *Yelp* ]]; then
+
+    if [[ "$title" == *"APSUM_TTrain_BINIMPUTrUsers10_KmDist10_PopGeoNN_SJUSk100"* ]] || [[ "$title" == *"APSUM_TTrain_BINIMPUTrUsers30_KmDist10_PopGeoNN_SJUSk100"* ]]; then
+
+      lambda_easers="0.5 200 500"
+      for lambda_easer in $lambda_easers
+      do
+          output_rec_file=$recommendationFolder/"$recPrefix"_"$title"_"easer"_"lambda"$lambda_easer"_ImplicitTrue".txt
+          if [ ! -f "$output_rec_file" ]; then
+            python ease_rec/main_imputation.py --training_imputation $trainFile --original_training $nonImputedTrainFile --test $testfile --implicit True --lamb $lambda_easer --nI $itemsRecommended --result $output_rec_file
+          fi
+
+          output_rec_file=$recommendationFolder/"$recPrefix"_"$title"_"easer"_"lambda"$lambda_easer"_ImplicitFalse".txt
+          if [ ! -f "$output_rec_file" ]; then
+            python ease_rec/main_imputation.py --training_imputation $trainFile --original_training $nonImputedTrainFile --test $testfile --lamb $lambda_easer --nI $itemsRecommended --result $output_rec_file
+          fi
+       done
+       wait
 
 
-    if [[ $city == *GB_London* ]]; then
+      saenad_epoch=20
+      saenad_batch_size=256
+      saenad_alpha=2
+      saenad_epsilon=1e-5
+      saenad_learning_rate=1e-3
+      saenad_weight_decay=1e-3
+      saenad_dropout_rate=0.5
+      saenad_gammas="30 60 90"
+      saenad_num_attentions="10 20 40"
+
+      for saenad_num_attention in $saenad_num_attentions
+      do
+        for saenad_gamma in $saenad_gammas
+        do
+            output_rec_file=$recommendationFolder/"$recPrefix"_"$title"_ep"$saenad_epoch"_a"$saenad_alpha"_at"$saenad_num_attention"_dr"$saenad_dropout_rate"_gm"$saenad_gamma"_l200-50-200SAE-NAD.txt
+            if [ ! -f "$output_rec_file" ]; then
+              python SAE-NAD_ADAPTED/run.py \
+                   --epoch "$saenad_epoch" \
+                   --batch_size "$saenad_batch_size" \
+                   --alpha "$saenad_alpha" \
+                   --epsilon "$saenad_epsilon" \
+                   --learning_rate "$saenad_learning_rate" \
+                   --weight_decay "$saenad_weight_decay" \
+                   --num_attention "$saenad_num_attention" \
+                   --dropout_rate "$saenad_dropout_rate" \
+                   --gamma "$saenad_gamma" \
+                   --training_file "$trainFile" \
+                   --original_training_set "$nonImputedTrainFile" \
+                   --coord_file "$cityPOICoords" \
+                   --test_set "$testfile" \
+                   --result_file "$output_rec_file" \
+                   --nI 100
+            fi
+
+
+        done
+        wait
+
+        done
+        wait
+
 
       for neighbours in $allneighbours
       do
@@ -908,8 +635,6 @@ do
       done # End Neighbours
       wait
 
-
-      if [[ "$title" == *"APSUM_TTrain_BINIMPUTrUsers10_KmDist10_PopGeoNN_SJUSk100"* ]] || [[ "$title" == *"APSUM_TTrain_BINIMPUTrUsers30_KmDist10_PopGeoNN_SJUSk100"* ]]; then
 
 
         for repetition in 1 #2 3 4
@@ -955,6 +680,8 @@ do
         done # Repetition
         wait
 
+
+
         for repetition in 1 #2 3 4 5
         do
           for factor in $BPRFactors
@@ -978,6 +705,7 @@ do
           wait
         done # Repetition
         wait
+
 
         for rankRecommenderNoSim in MFRecommenderHKV
         do
@@ -1054,6 +782,7 @@ do
           wait
 
 
+
   # RankGeoTest
     for c in $cs_RANKGEOFM
     do
@@ -1081,7 +810,7 @@ do
 
                         outputRecfile=$recommendationFolder/"$recPrefix"_"$title"_RSys_POI_"RankGeoFM""kFac"$kFactorizer"kNgh"$kNeighbour"dec"$decay"bDriv"$isboldDriver"It"$numIter"lR"$learnRate"mR"$maxRate"a"$alphaF"c"$c"eps"$epsilon"".txt
                         $javaCommand $jvmMemory -jar $JAR -o ranksysOnlyComplete -trf $trainFile -trf2 $nonImputedTrainFile -tsf $testfile -cIndex false -rr "RankGeoFMRecommender" -coordFile $cityPOICoords -n $kNeighbour -nIFactorizer $numIter -kFactorizer $kFactorizer -aFactorizer $alphaF -epsilon $epsilon -c $c -svdDecay $decay -svdIsboldDriver $isboldDriver -svdLearnRate $learnRate -svdMaxLearnRate $maxRate -nI $itemsRecommended -orf $outputRecfile
-                        #$javaCommand $jvmMemory -jar $JAR -o CheckRecommendationsFile -trf $nonImputedTrainFile -tsf $testfile -rf $outputRecfile
+                        $javaCommand $jvmMemory -jar $JAR -o CheckRecommendationsFile -trf $nonImputedTrainFile -tsf $testfile -rf $outputRecfile
 
                       done # ENd max learn
                       wait
@@ -1108,6 +837,8 @@ do
     done # End c
     wait
 
+
+
         #Second baseline: popularity, knn and minimum distance
         for poiRecommender in PopGeoNN
         do
@@ -1118,7 +849,7 @@ do
               poiRecommender="PopGeoNN"
               outputRecfile=$recommendationFolder/"$recPrefix"_"$title"_RSys_POI_"$poiRecommender"_UBSim_"$UBsimilarity"_k"$neighbours".txt
               $javaCommand $jvmMemory -jar $JAR -o ranksysOnlyComplete -trf $trainFile -trf2 $nonImputedTrainFile -tsf $testfile -cIndex true -rr $poiRecommender -rs $UBsimilarity -nI $itemsRecommended -n $neighbours -orf $outputRecfile -coordFile $cityCompletePOICoords
-              #$javaCommand $jvmMemory -jar $JAR -o CheckRecommendationsFile -trf $nonImputedTrainFile -tsf $testfile -rf $outputRecfile
+              $javaCommand $jvmMemory -jar $JAR -o CheckRecommendationsFile -trf $nonImputedTrainFile -tsf $testfile -rf $outputRecfile
 
             done # End neighbours
             wait
@@ -1130,6 +861,7 @@ do
 
 
         #IRENMF
+
         resultFileNNCityFile=$pathDest/"$processedCities"/POIS_""$city""$suffixnewTrain""_"$GeoNN"NN.txt
         poisCoordsOfCityFile=$pathDest/"$processedCities"/POIS_""$city""$suffixnewTrain""_"$extensionCoords"
 
@@ -1158,13 +890,14 @@ do
                       $pathMatlab/./matlab -nodisplay -nodesktop -r "cd '$pathIrenMFTesWithTrain/'; ItemGroupPOI('$configureFileSimple', '$pathDest/$trainFile', '$poisCoordsOfCityFile', '$resultFileNNCityFile', '$pathDest/$testfile', '$resultFileNNCityFile', '$outputRecfile_IRENMF', '$clusterFile'); quit"
 
 
-                      #$javaCommand $jvmMemory -jar $JAR -o CheckRecommendationsFile -trf $nonImputedTrainFile -tsf $testfile -rf $outputRecfile_IRENMF
+                      #
+                      $javaCommand $jvmMemory -jar $JAR -o CheckRecommendationsFile -trf $nonImputedTrainFile -tsf $testfile -rf $outputRecfile_IRENMF
 
                       $javaCommand $jvmMemory -jar $JAR -o filterRecFileByTrain -trf $nonImputedTrainFile -rf $outputRecfile_IRENMF -orf $outputRecfile -thr 100
                       rm $outputRecfile_IRENMF
 
                       echo "This should NOT find repetitions"
-                      #$javaCommand $jvmMemory -jar $JAR -o CheckRecommendationsFile -trf $nonImputedTrainFile -tsf $testfile -rf $outputRecfile
+                      $javaCommand $jvmMemory -jar $JAR -o CheckRecommendationsFile -trf $nonImputedTrainFile -tsf $testfile -rf $outputRecfile
 
                       echo "Finished $configureFileSimple"
                   fi
@@ -1177,12 +910,10 @@ do
       done
       wait #End KIRENMF
 
-      fi
 
+    fi # Specific city
 
-
-    fi
-
+  fi # All for APSUM_TTrain_BINIMPUTrUsers10_KmDist10_PopGeoNN_SJUSk100 and APSUM_TTrain_BINIMPUTrUsers10_KmDis310_PopGeoNN_SJUSk100
 
 
   done # End find
@@ -1204,7 +935,6 @@ wait
 : '
 Evaluation part
 '
-JAR=ImputationForPOIRecSys.jar
 nonaccresultsPrefix=naev
 evthreshold=1
 
